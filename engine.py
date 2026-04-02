@@ -256,5 +256,3 @@ if __name__ == "__main__":
     window = Window(value.width(),value.height(),"Tic-Tac-Toe","")
     window.show()
     sys.exit(app.exec())
-
-

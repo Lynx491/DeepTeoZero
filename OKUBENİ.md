@@ -32,6 +32,9 @@
 1. Gereklilikleri yükle: `pip install -r requirements.txt`
 2. Oyunu çalıştır: `python3 engine.py`
 
+> Motor ile maç atabilmek için bir sinir ağına ihtiyaç duyar.
+
+> network_v1_alpha.zip
 ---
 
 ## 📄 Lisans

@@ -32,6 +32,10 @@
 1. Install dependencies: `pip install -r requirements.txt`
 2. Run the game: `python3 engine.py`
 
+> To play matches with the engine, it requires a neural network.
+
+> network_v1_alpha.zip
+
 ---
 
 ## 📄 Licence
