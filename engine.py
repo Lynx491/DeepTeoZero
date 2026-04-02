@@ -1,10 +1,17 @@
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
-import sys
+import sys,os
 from stable_baselines3 import DQN
 import random
 from main import Tictactoe    
+import torch
+
+if torch.cuda.is_available():
+    device = torch.device("cuda")
+else:
+    device = torch.device("cpu") 
+
 
 class Window(QWidget):
     hbr_player_hamle = Signal(int)
@@ -128,7 +135,7 @@ class Window(QWidget):
 
     def start(self):
         game = network()
-        game.load("./network_v1_alpha.zip")
+        game.load("network_v1_alpha.zip")
         self.label.setText("Tic-Tac-Toe")
         for i in self.buttons:
             i.setText("")
@@ -200,7 +207,19 @@ class network():
         self.CEZA = -1
         self.ÖDÜL = 1
     def load(self,model_path):
-        self.model = DQN.load(model_path,env=self.game,device="cpu")
+        çalıştırıldığı_dizin = os.path.dirname(sys.executable)
+        yol = os.path.join(çalıştırıldığı_dizin,model_path)
+        if os.path.exists(yol):
+            model_yolu = yol
+        else:
+            ayraç = os.sep
+            yol = rf".{ayraç}{model_path}"
+            if os.path.exists(yol):
+                model_yolu = yol
+        
+        self.model = DQN.load(model_yolu,env=self.game,device=device)
+            
+
 
     
     def başlat(self):
