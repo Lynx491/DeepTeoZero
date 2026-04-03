@@ -1,4 +1,4 @@
-# 🤖 TicTacToe AI engine (v0.1.0-Alpha)
+# 🤖 TicTacToe AI engine (v0.1.1-Alpha)
 
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![PySide6](https://img.shields.io/badge/Qt-41CD52?style=for-the-badge&logo=qt&logoColor=white)
@@ -34,7 +34,7 @@
 
 > To play matches with the engine, it requires a neural network.
 
-> network_v1_alpha.zip
+> Neural Network .zip
 
 ---
 
