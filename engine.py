@@ -6,12 +6,32 @@ from stable_baselines3 import DQN
 import random
 from main import Tictactoe    
 import torch
+import glob
 
 if torch.cuda.is_available():
     device = torch.device("cuda")
 else:
     device = torch.device("cpu") 
 
+
+#GLOBAL VERİABLE
+APP_STYLE = """
+QWidget{
+background-color:#111111;
+}
+
+QLabel{
+color:#FFFFFF;
+}
+
+QPushButton{
+background-color:#222222;
+color:#000000;
+}
+QPushButton::hover{
+background-color:#555555;
+}
+"""
 
 class Window(QWidget):
     hbr_player_hamle = Signal(int)
@@ -22,11 +42,12 @@ class Window(QWidget):
         self.playerın_hamlesi:int
         self.genişlik = width
         self.yükseklik = height
-        self.setGeometry(0,0,self.genişlik,self.yükseklik)
+        # self.setGeometry(0,0,self.genişlik,self.yükseklik)
         self.setWindowTitle(window_title)
         if window_icon_path != "": #eğer icon verilmemişse
-            self.windowIcon(QIcon(window_icon_path))
-        self.setStyleSheet("background-color:#111111;")
+            icon_path = self.iconyoluver = (window_icon_path)
+            self.setWindowIcon(QIcon(icon_path))
+        self.setStyleSheet(APP_STYLE)
         
         self.root_frame = QFrame(self)
         self.root_frame_w = 490
@@ -37,20 +58,25 @@ class Window(QWidget):
         self.label = QLabel(self.root_frame)
         self.label_font = QFont("Roboto",20)
         self.label.setFont(self.label_font)
-        self.label.setGeometry(0,0,600,50)
-        self.label.setStyleSheet("color:#FFFFFF")
+        self.label.setGeometry(10,0,600,50)
+        # self.label.setStyleSheet("color:#FFFFFF")
         self.label.setText("Tic-Tac-Toe")
 
         self.baslat = QPushButton(self.root_frame)
         self.baslat_font = QFont("Roboto",20)
         self.baslat.setFont(self.baslat_font)
-        self.baslat.setGeometry(0,540,150,50)
+        self.baslat.setGeometry(10,540,150,50)
         self.baslat.setText("START")
         self.baslat.clicked.connect(self.start)
         
+        self.box_network = QComboBox(self.root_frame)
+        self.box_network_font = QFont("Roboto",12)
+        self.box_network.setFont(self.box_network_font)
+        self.box_network.setGeometry(170,540,305,50)
+
 
         self.qframe = QFrame(self.root_frame)
-        self.qframe.setStyleSheet("background-color:#333333;")
+        # self.qframe.setStyleSheet("background-color:#333333;")
         self.qframe_w = 490
         self.qframe_h = 490
         self.qframe.setGeometry(0,45,self.qframe_w,self.qframe_h)
@@ -105,7 +131,50 @@ class Window(QWidget):
         self.btn_sekiz.clicked.connect(lambda: self.tetikleyici(8))
 
         self.buttons = [self.btn_sıfır,self.btn_bir,self.btn_iki,self.btn_uc,self.btn_dort,self.btn_bes,self.btn_altı,self.btn_yedi,self.btn_sekiz]
-    
+        self.network_bul()
+
+    def network_bul(self):
+        ayraç = os.sep
+        çalıştırıldığı_dizin = os.path.dirname(sys.executable)
+        yol = os.path.join(çalıştırıldığı_dizin,"models")
+        if os.path.exists(yol):
+            modeller_yolu = yol
+        else:
+            yol = rf".{ayraç}models"
+            if os.path.exists(yol):
+                modeller_yolu = yol
+                
+        modellerData = []
+        modellerText = []
+        i = 0
+        game = Tictactoe()
+        liste = glob.glob(modeller_yolu+ayraç+"*.zip")
+        if liste:
+            for file in liste: #/models kısmındaki bütün .zip ile bitenleri listele
+                parçalar = file.split(ayraç) # isim kısmını alıyoruz çünkü basitlik sağlar
+                sonindex = len(parçalar)-1
+                text = parçalar[sonindex]
+                modellerData.append(file)  
+                modellerText.append(text)
+            for yol,text in zip(modellerData,modellerText):  # combobox a ekle
+                self.box_network.addItem(text,yol)   
+        else:
+            QMessageBox.critical(self,"Kaybolan SinirAğları...",f".{ayraç}models/ klasörü altında .zip ile biten sinir ağları bulunamadı.") 
+            
+
+    def iconyoluver(icon_name):
+        if sys.platform == "linux" or sys.platform == "darwin": 
+            icon_name += ".png"
+        elif sys.platform == "win32":
+            icon_name += ".ico"
+        try:
+            yol = sys._MEIPASS #temp yolu
+        except:
+            yol = os.path.abspath(".")
+        path = f"{yol}/{icon_name}"
+        if os.path.exists(path):
+            return path
+
     def yüzde_hesapla(self,genişlik,yükseklik):
         g = (self.genişlik/100)*genişlik
         y = (self.yükseklik/100)*yükseklik
@@ -135,7 +204,9 @@ class Window(QWidget):
 
     def start(self):
         game = network()
-        game.load("network_v1_alpha.zip")
+        #combobox taki en üstteki seçeneği ele al
+        data = self.box_network.currentData()
+        game.load(data) #valueyi direkt al
         self.label.setText("Tic-Tac-Toe")
         for i in self.buttons:
             i.setText("")
@@ -206,18 +277,9 @@ class network():
         self.BERABERE = -0.5
         self.CEZA = -1
         self.ÖDÜL = 1
-    def load(self,model_path):
-        çalıştırıldığı_dizin = os.path.dirname(sys.executable)
-        yol = os.path.join(çalıştırıldığı_dizin,model_path)
-        if os.path.exists(yol):
-            model_yolu = yol
-        else:
-            ayraç = os.sep
-            yol = rf".{ayraç}{model_path}"
-            if os.path.exists(yol):
-                model_yolu = yol
-        
-        self.model = DQN.load(model_yolu,env=self.game,device=device)
+    def load(self,model_yolu):
+        if os.path.exists(model_yolu):
+            self.model = DQN.load(model_yolu,env=self.game,device=device)
             
 
 
@@ -253,6 +315,9 @@ if __name__ == "__main__":
     
     qtscreen = app.primaryScreen()
     value = qtscreen.availableGeometry()
-    window = Window(value.width(),value.height(),"Tic-Tac-Toe","")
-    window.show()
+    window = Window(value.width(),value.height(),"Tic-Tac-Toe","DTZ_icon")
+    window.showMaximized()
     sys.exit(app.exec())
+
+
+
