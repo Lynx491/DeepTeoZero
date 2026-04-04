@@ -39,11 +39,11 @@
 ---
 ## 🛠️ Windows Build
 1. Install dependencies: `pip install -r requirements.txt && pip install pyinstaller`
-2. Compilation: `pyinstaller engine.py --onefile --noconsole --add-data "DTZ_icon.ico" --icon=DTZ_icon.ico --collect-all stable_baselines3 --collect-all torch`
+2. Compilation: `pyinstaller engine.py --onefile --noconsole --add-data "DTZ_icon.ico,." --icon=DTZ_icon.ico --collect-all stable_baselines3 --collect-all torch`
 
 ## 🛠️ Linux And MacOS Build
 1. Install dependencies: `pip install -r requirements.txt && pip install pyinstaller`
-2. Compilation: `pyinstaller engine.py --onefile --noconsole --add-data "DTZ_icon.png" --icon=DTZ_icon.png --collect-all stable_baselines3 --collect-all torch`
+2. Compilation: `pyinstaller engine.py --onefile --noconsole --add-data "DTZ_icon.png:." --icon=DTZ_icon.png --collect-all stable_baselines3 --collect-all torch`
 
 ---
 
